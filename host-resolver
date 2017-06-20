@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+
+import dns.resolver
+import argparse
+import sys
+import tldextract
+import ipaddress
+from dns import reversename
+from time import sleep
+
+parser = argparse.ArgumentParser(description='DNS Lookup')
+parser.add_argument('--domain','-d',help='Enter the Domain name or IP to use as DNS server',required=True,dest='domain')
+parser.add_argument('-r','--range',help='Enter the network CIDR range for lookups',required=True,nargs='+',dest='net_ranges')
+args = parser.parse_args()
+
+
+resolver = dns.resolver.Resolver()
+dns = (resolver.query(args.domain,'A'))[0].address
+resolver.nameservers = [dns]
+
+print ('[!] Using ' + str(dns) + ' as the DNS server.')
+
+for raw_range in args.net_ranges:
+        print ("\nSearching " + args.domain + " for IPs in " + raw_range + ':')
+        range = ipaddress.ip_network(raw_range)
+        for host in range:
+                host = str(host)
+                bit_check = host.split('.')
+                if bit_check[3] == '0' or bit_check[3] == '255':
+                        continue
+                try:
+                        rev_name = reversename.from_address(str(host))
+                        hostname = resolver.query(rev_name, "PTR")
+                        print ('[+]\t' + host + ": " + str(hostname[0]))
+                        sleep(0.2)
+                except:
+                        pass
