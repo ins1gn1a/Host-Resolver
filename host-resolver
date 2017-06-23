@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser(description='DNS Lookup')
 parser.add_argument('--domain','-d',help='Enter the Domain name or IP to use as DNS server',required=True,dest='domain')
 parser.add_argument('-r','--range',help='Enter the network CIDR range for lookups',required=True,nargs='+',dest='net_ranges')
 parser.add_argument('-t','--throttle',help='Set a throttle limit between resolution requests. Specify in ms (e.g. 2000 for 2 seconds) Default of 200ms.',dest='throttle',default=200)
+parser.add_aguemnt('-f','--filter',help='Filter hostname results by string/text. Partial comparisons will be made.',dest='filter')
 args = parser.parse_args()
 
 # convert to sleep() for ms
@@ -19,6 +20,11 @@ throttle = args.throttle / 1000
 resolver = dns.resolver.Resolver()
 dns = (resolver.query(args.domain,'A'))[0].address
 resolver.nameservers = [dns]
+filtered_results = []
+if len(args.filter) > 0:
+    filter = True
+else:
+    filter = False
 
 print ('[!] Using ' + str(dns) + ' as the DNS server.')
 
@@ -33,8 +39,15 @@ for raw_range in args.net_ranges:
                 try:
                         rev_name = reversename.from_address(str(host))
                         hostname = resolver.query(rev_name, "PTR")
-                        print ('[+]\t' + host + ": " + str(hostname[0]))
+                        if filter:
+                            if str(arg.filter).lower() in str(hostname[0]):
+                                print ('[+]\t' + host + ": " + str(hostname[0]))
+                            else:
+                                filtered_results.append(str(hostname[0]))
+                        else:
+                            print ('[+]\t' + host + ": " + str(hostname[0]))
                         sleep(throttle)
                 except:
                         pass
-                        
+
+        print ('[!] ' + str(len(filtered_results)) + ' results were filtered.')
