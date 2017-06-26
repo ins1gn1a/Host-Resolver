@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(description='DNS Lookup')
 parser.add_argument('--domain','-d',help='Enter the Domain name or IP to use as DNS server',required=True,dest='domain')
 parser.add_argument('-r','--range',help='Enter the network CIDR range for lookups',required=True,nargs='+',dest='net_ranges')
 parser.add_argument('-t','--throttle',help='Set a throttle limit between resolution requests. Specify in ms (e.g. 2000 for 2 seconds) Default of 200ms.',dest='throttle',default=200)
-parser.add_argument('-f','--filter',help='Filter hostname results by string/text. Partial comparisons will be made.',dest='filter')
+parser.add_argument('-f','--filter',help='Filter hostname results by string/text. Partial comparisons will be made.',dest='filter',default="")
 args = parser.parse_args()
 
 # convert to sleep() for ms
