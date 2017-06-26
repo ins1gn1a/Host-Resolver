@@ -16,7 +16,7 @@ parser.add_argument('-f','--filter',help='Filter hostname results by string/text
 args = parser.parse_args()
 
 # convert to sleep() for ms
-throttle = args.throttle / 1000
+throttle = int(args.throttle) / 1000
 resolver = dns.resolver.Resolver()
 dns = (resolver.query(args.domain,'A'))[0].address
 resolver.nameservers = [dns]
