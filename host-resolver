@@ -28,7 +28,9 @@ else:
 
 print ('[!] Using ' + str(dns) + ' as the DNS server.')
 
-for raw_range in args.net_ranges:
+with open(args.domain.rstrip() + ".txt","w") as text_file:
+    full_list = []
+    for raw_range in args.net_ranges:
         print ("\nSearching " + args.domain + " for IPs in " + raw_range + ':')
         range = ipaddress.ip_network(raw_range)
         for host in range:
@@ -41,11 +43,14 @@ for raw_range in args.net_ranges:
                         hostname = resolver.query(rev_name, "PTR")
                         if filter:
                             if str(arg.filter).lower() in str(hostname[0]):
-                                print ('[+]\t' + host + ": " + str(hostname[0]))
+                                print (host + ": " + str(hostname[0]).rstrip("."))
+                                text_file.write(str(hostname[0]).rstrip(".")  + "\n")
                             else:
-                                filtered_results.append(str(hostname[0]))
+                                filtered_results.append(str(hostname[0]).rstrip("."))
                         else:
-                            print ('[+]\t' + host + ": " + str(hostname[0]))
+                            print (host + ": " + str(hostname[0]).rstrip("."))
+                            text_file.write(str(hostname[0]).rstrip(".") + "\n")
+                            
                         sleep(throttle)
                 except:
                         pass
